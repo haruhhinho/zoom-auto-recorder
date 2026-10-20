@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+# 録画・同梱バイナリ・調査用ファイルは含めない
+*.mp4
+*.mkv
+*.wav
+.tmp_*/
+ffmpeg.exe
+ffmpeg/
+zoom_ui_*.txt
+*.log

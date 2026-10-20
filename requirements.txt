@@ -1,0 +1,2 @@
+PyAudioWPatch>=0.2.12
+pywinauto>=0.6.8
