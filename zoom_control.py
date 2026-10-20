@@ -254,12 +254,17 @@ def focus_window(hwnd: int) -> bool:
     return u.GetForegroundWindow() == hwnd
 
 
-def _alt_f() -> None:
+def alt_key(vk: int) -> None:
+    """Alt+キー を送る（Zoom のショートカット用。例: 0x46=F 全画面, 0x48=H チャット）。"""
     u = _user32()
     u.keybd_event(0x12, 0, 0, 0)
-    u.keybd_event(0x46, 0, 0, 0)
-    u.keybd_event(0x46, 0, 2, 0)
+    u.keybd_event(vk, 0, 0, 0)
+    u.keybd_event(vk, 0, 2, 0)
     u.keybd_event(0x12, 0, 2, 0)
+
+
+def _alt_f() -> None:
+    alt_key(0x46)
 
 
 def make_fullscreen(hwnd: int, primary_only: bool = True, uia_click=None) -> str:
@@ -295,3 +300,22 @@ def make_fullscreen(hwnd: int, primary_only: bool = True, uia_click=None) -> str
     # 3) 最大化で代用
     u.ShowWindow(hwnd, 3)  # SW_MAXIMIZE
     return "max"
+
+
+def window_rect(hwnd: int) -> tuple[int, int, int, int]:
+    r = _rect(hwnd)
+    return r.left, r.top, r.right, r.bottom
+
+
+def overlap_area(a: tuple, b: tuple) -> int:
+    w = min(a[2], b[2]) - max(a[0], b[0])
+    h = min(a[3], b[3]) - max(a[1], b[1])
+    return max(0, w) * max(0, h)
+
+
+def minimize_window(hwnd: int) -> bool:
+    """ウィンドウを最小化する（SW_SHOWMINNOACTIVE: 他のウィンドウの前面は奪わない）。"""
+    u = _user32()
+    u.ShowWindow(hwnd, 7)
+    time.sleep(0.3)
+    return not window_alive(hwnd) or bool(u.IsIconic(hwnd))
